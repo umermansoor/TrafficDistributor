@@ -1,6 +1,6 @@
 package com.umermansoor.trafficdistributor.net;
 
-import com.umermansoor.trafficdistributor.Configuration;
+import com.umermansoor.trafficdistributor.config.Configuration;
 import com.umermansoor.trafficdistributor.util.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 
 /**
- * Manages Outbound connections.
+ * Manages Outbound TCP connections to servers.
  */
 public class OutboundConnectionManager implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(OutboundConnectionManager.class);
@@ -49,14 +49,11 @@ public class OutboundConnectionManager implements Runnable {
             } catch (ExecutionException ee) {
                 //TODO: Handle this
             }
-
         }
 
         pool.shutdownNow();
 
         boolean closed = false;
-
-
         try {
             closed = pool.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
         } catch (InterruptedException ignored) { /** Ignored because exiting **/}

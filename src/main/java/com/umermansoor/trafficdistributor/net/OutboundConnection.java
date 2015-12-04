@@ -1,6 +1,6 @@
 package com.umermansoor.trafficdistributor.net;
 
-import com.umermansoor.trafficdistributor.Configuration;
+import com.umermansoor.trafficdistributor.config.Configuration;
 import com.umermansoor.trafficdistributor.util.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class OutboundConnection implements Runnable {
             /**
              * Log the exception and give up.
              */
-            logger.error("Error connecting to host {}. {}", host, e.toString());
+            logger.error("error communicating with host (server) {}. {}", host, e.toString());
         } finally {
             if (socket != null) {
                 try {
@@ -60,13 +60,14 @@ public class OutboundConnection implements Runnable {
         String json;
 
         try {
-            while ((json = in.readLine()) != null) {
+            while ((json = in.readLine()) != null ||
+                    !Thread.currentThread().isInterrupted()) {
                 logger.debug("received event: {}", json);
                 centralQueue.add(json);
             }
         } catch (Exception e) {
             // Log and give up
-            logger.debug("Error reading from {}. {}", host, e.toString());
+            logger.debug("error reading from {}. {}", host, e.toString());
         }
 
     }

@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor;
+package com.umermansoor.trafficdistributor.config;
 
 
 public class Configuration {
