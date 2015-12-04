@@ -11,8 +11,12 @@ import java.net.Socket;
 import java.util.Queue;
 
 /**
- * Connects to a server that is producing events and puts events in the
- * cental queue.
+ * Task for handling communication with an outbound socket. The socket
+ * represents a server connection from which data is received. This task
+ * will run until it is interrupted by another thread.
+ *
+ * When an event is received from the server, it stores the event to the
+ * central queue.
  *
  * @author umermansoor
  */
@@ -40,9 +44,7 @@ public class OutboundConnection implements Runnable {
 
             read(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         } catch (Exception e) {
-            /**
-             * Log the exception and give up.
-             */
+              // Log the exception and give up.
             logger.error("error communicating with host (server) {}. {}", host, e.toString());
         } finally {
             if (socket != null) {

@@ -1,7 +1,7 @@
 package com.umermansoor.trafficdistributor.config;
 
 /**
- * This class contains configuration parameters.
+ * This class contains configuration parameters for this application.
  *
  * @author umer mansoor
  */

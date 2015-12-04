@@ -12,16 +12,22 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 /**
- * Manages Outbound TCP connections to servers.
+ * Manages outgoing TCP connections to servers. For each server connection, it
+ * creates a task which is an instance of {@link com.umermansoor.trafficdistributor.net.OutboundConnection}
+ * and hands it the responsibility of handling communications with the server.
+ *
+ * If the socket to client becomes disconnected, it creates a new task to
+ * re-establish connection (if specified in settings).
+ *
+ * @author umermansoor
  */
-public class OutboundConnectionManager implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(OutboundConnectionManager.class);
+public class OutboundConnectionsManager implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(OutboundConnectionsManager.class);
     private final List<Host> hosts;
     private final Queue<String> centralQueue;
 
-    public OutboundConnectionManager(List<Host> h, Queue<String> q) {
+    public OutboundConnectionsManager(List<Host> h, Queue<String> q) {
         hosts = h;
         centralQueue = q;
     }
@@ -51,6 +57,11 @@ public class OutboundConnectionManager implements Runnable {
             }
         }
 
+        /**
+         * In a real application, this is where some type of cleanup will be
+         * performed.
+         */
+
         pool.shutdownNow();
 
         boolean closed = false;
@@ -59,9 +70,9 @@ public class OutboundConnectionManager implements Runnable {
         } catch (InterruptedException ignored) { /** Ignored because exiting **/}
 
         if (closed) {
-            logger.info("successfully shutdown OutboundConnectionManager.");
+            logger.info("successfully shutdown OutboundConnectionsManager.");
         } else {
-            logger.error("failed to properly shutdown OutboundConnectionManager.");
+            logger.error("failed to properly shutdown OutboundConnectionsManager.");
         }
     }
 

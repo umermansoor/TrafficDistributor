@@ -1,7 +1,7 @@
 package com.umermansoor.trafficdistributor;
 
-import com.umermansoor.trafficdistributor.net.IncomingConnectionManager;
-import com.umermansoor.trafficdistributor.net.OutboundConnectionManager;
+import com.umermansoor.trafficdistributor.net.IncomingConnectionsManager;
+import com.umermansoor.trafficdistributor.net.OutboundConnectionsManager;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 
@@ -22,18 +22,25 @@ public class App {
     public static void main(String[] args) {
         ArrayList<Host> hosts = new ArrayList<Host>(1);
         hosts.add(new Host("localhost", 6001));
+
+        /**
+         * The central queue where events received from servers are stored and
+         * are consumed by client tasks.
+         */
         LinkedBlockingQueue<String> centralQueue = new LinkedBlockingQueue<String>(2000);
 
         CountDownLatch serverStartedSignal = new CountDownLatch(1);
-        final IncomingConnectionManager inboundconnectionManager = new IncomingConnectionManager(
+        final IncomingConnectionsManager inboundConnectionManager = new IncomingConnectionsManager(
                 centralQueue, serverStartedSignal);
-        final Thread inboundThread = new Thread(inboundconnectionManager);
+        final Thread inboundThread = new Thread(inboundConnectionManager);
         inboundThread.start();
 
+        // Wait for the internal TCP server to be started.
         try {
             boolean started = serverStartedSignal.await(5, TimeUnit.SECONDS);
-            if (started == false) {
-                logger.debug("could not start server to accept client connections. Quitting application.");
+            if (!started) {
+                logger.debug("could not start internal server for accepting client connections. " +
+                        " Port already in use? Quitting application.");
                 inboundThread.interrupt();
                 inboundThread.join();
                 return;
@@ -41,17 +48,21 @@ public class App {
         } catch (InterruptedException ignored) {
         }
 
-        final OutboundConnectionManager outboundConnectionManager = new OutboundConnectionManager(
+        final OutboundConnectionsManager outboundConnectionManager = new OutboundConnectionsManager(
                 hosts, centralQueue);
         final Thread outboundThread = new Thread(outboundConnectionManager);
         outboundThread.start();
 
+        /**
+         * Add a shutdown hook (CTRL+C, kill, etc.) to shutdown all other
+         * threads gracefully and allow them to cleanup.
+         */
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 logger.info("shutdown initiated.");
                 outboundThread.interrupt();
-                inboundconnectionManager.cancelTask();
+                inboundConnectionManager.cancelTask();
 
                 try {
                     outboundThread.join();
@@ -59,9 +70,8 @@ public class App {
                 } catch (InterruptedException ignored) {
                 }
 
-                logger.info("shutdown completed.");
+                logger.info("shutdown completed. good bye.");
             }
         });
-
     }
 }

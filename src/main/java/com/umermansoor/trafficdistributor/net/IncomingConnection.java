@@ -9,27 +9,40 @@ import java.net.Socket;
 import java.util.Queue;
 
 /**
- * Handles TCP Client connection.
+ * Task for handling communication with an incoming socket. The socket
+ * represents a client connection to which data is to be sent. This task
+ * will run until it is interrupted by another thread.
+ *
+ * It checks the central queue for events and if an event is available, it
+ * removes it from the queue and sends it to the client.
+ *
+ * @author umermansoor
  */
 public class IncomingConnection implements Runnable {
+    private final Queue<String> centralEventsQueue;
+    private final Socket clientSocket;
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnection.class);
-    private final Queue<String> centralQueue;
-    private final Socket clientSocket;
 
 
     public IncomingConnection(Queue<String> q, Socket s) {
-        centralQueue = q;
+        centralEventsQueue = q;
         clientSocket = s;
     }
 
     public void run() {
         String event;
         while (!Thread.currentThread().isInterrupted()) {
-            event = centralQueue.poll();
+            event = centralEventsQueue.poll();
             if (event == null) {
                 continue;
             }
+
+            /**
+             * Note: In a normal Mission Critical application, implementing a
+             * PING-PONG (or Heartbeat) mechanism is highly recommended to
+             * avoid the loss of data.
+             */
 
             try {
                 BufferedWriter out = new BufferedWriter(new

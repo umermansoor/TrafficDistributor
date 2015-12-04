@@ -11,21 +11,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Manages incoming TCP connections from clients. When a client connects, it
- * creates a new instance of {@link com.umermansoor.trafficdistributor.net.IncomingConnection}
- * and hands-over the responsibility of communicating with this client for
- * as long as the session is open.
+ * Manages incoming TCP connections from clients. Starts a TCP server to
+ * listen for client connections. When a client is connected, it creates a new
+ * instance of {@link com.umermansoor.trafficdistributor.net.IncomingConnection} and hands it the
+ * responsibility of handling communications with this client.
  *
- * @author umer mansoor
+ * @author umermansoor
  */
-public class IncomingConnectionManager implements Runnable {
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnectionManager.class);
+public class IncomingConnectionsManager implements Runnable {
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnectionsManager.class);
     private final Queue<String> centralQueue;
     private final ExecutorService pool = Executors.newFixedThreadPool(Configuration.MAX_CLIENT_CONNECTIONS);
     private final CountDownLatch serverStartedSignal;
     ServerSocket server;
 
-    public IncomingConnectionManager(Queue<String> q, CountDownLatch l) {
+    public IncomingConnectionsManager(Queue<String> q, CountDownLatch l) {
         centralQueue = q;
         serverStartedSignal = l;
 
@@ -35,8 +35,11 @@ public class IncomingConnectionManager implements Runnable {
         startServer();
     }
 
+    /**
+     * Starts a TCP server to listen for clients. Exits if the server couldn't
+     * be started.
+     */
     private void startServer() {
-
         try {
             server = new ServerSocket(Configuration.LISTENING_PORT);
         } catch (Exception e) {
@@ -52,13 +55,19 @@ public class IncomingConnectionManager implements Runnable {
             try {
 
                 Socket client = server.accept();
+                logger.debug("new client connected {}.", client.getInetAddress().getHostAddress());
+                // Pass the client socket to the handler thread.
                 pool.submit(new IncomingConnection(centralQueue, client));
-                logger.debug("client connected {}.", client.getInetAddress().getHostAddress());
             } catch (java.io.IOException ioe) {
                 logger.error("{}", ioe.toString());
                 break;
             }
         }
+
+        /**
+         * In a real application, this is where some type of cleanup will be
+         * performed.
+         */
 
         pool.shutdownNow();
 
@@ -68,9 +77,9 @@ public class IncomingConnectionManager implements Runnable {
         } catch (InterruptedException ignored) { /** Ignored because exiting **/}
 
         if (closed) {
-            logger.info("successfully shutdown IncomingConnectionManager.");
+            logger.info("successfully shutdown IncomingConnectionsManager.");
         } else {
-            logger.error("failed to properly shutdown IncomingConnectionManager.");
+            logger.error("failed to properly shutdown IncomingConnectionsManager.");
         }
     }
 

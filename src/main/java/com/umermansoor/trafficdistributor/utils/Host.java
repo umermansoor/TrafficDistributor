@@ -13,8 +13,8 @@ public class Host {
 
     /**
      * Constructor
-     * @param hostname
-     * @param port
+     * @param hostname Hostname or ip address
+     * @param port Tcp port.
      */
     public Host(String hostname, int port) {
 
@@ -49,13 +49,13 @@ public class Host {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Host == false) {
+        if ( !(obj instanceof Host )) {
             return false;
         }
 
         Host otherHost = (Host)obj;
 
-        return otherHost.hostname == hostname && otherHost.port == port;
+        return otherHost.hostname.equals(hostname) && otherHost.port == port;
     }
 
     @Override
