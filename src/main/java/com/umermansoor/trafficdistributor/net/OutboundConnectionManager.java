@@ -54,8 +54,6 @@ public class OutboundConnectionManager implements Runnable {
         }
 
         pool.shutdownNow();
-
-
     }
 
 }
