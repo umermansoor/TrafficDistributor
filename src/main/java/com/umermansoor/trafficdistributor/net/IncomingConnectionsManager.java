@@ -2,7 +2,7 @@ package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.config.Configuration;
 import org.slf4j.Logger;
-
+import com.umermansoor.trafficdistributor.handlers.EventHandler;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Queue;
@@ -19,16 +19,18 @@ import java.util.concurrent.Executors;
  * @author umermansoor
  */
 public class IncomingConnectionsManager implements Runnable {
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnectionsManager.class);
     private final Queue<String> centralQueue;
     private final ExecutorService pool = Executors.newFixedThreadPool(Configuration.MAX_CLIENT_CONNECTIONS);
     private final CountDownLatch serverStartedSignal;
-    ServerSocket server;
+    private ServerSocket server;
+    private EventHandler handler;
 
-    public IncomingConnectionsManager(Queue<String> q, CountDownLatch l) {
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnectionsManager.class);
+
+    public IncomingConnectionsManager(Queue<String> q, CountDownLatch l, EventHandler h) {
         centralQueue = q;
         serverStartedSignal = l;
-
+        handler = h;
     }
 
     public void run() {
@@ -57,7 +59,7 @@ public class IncomingConnectionsManager implements Runnable {
                 Socket client = server.accept();
                 logger.debug("new client connected {}.", client.getInetAddress().getHostAddress());
                 // Pass the client socket to the handler thread.
-                pool.submit(new IncomingConnection(centralQueue, client));
+                pool.submit(new IncomingConnection(centralQueue, client, handler));
             } catch (java.io.IOException ioe) {
                 logger.error("{}", ioe.toString());
                 break;

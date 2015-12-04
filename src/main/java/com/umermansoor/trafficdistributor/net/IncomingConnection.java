@@ -1,7 +1,7 @@
 package com.umermansoor.trafficdistributor.net;
 
 import org.slf4j.Logger;
-
+import com.umermansoor.trafficdistributor.handlers.EventHandler;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -21,13 +21,14 @@ import java.util.Queue;
 public class IncomingConnection implements Runnable {
     private final Queue<String> centralEventsQueue;
     private final Socket clientSocket;
+    private final EventHandler eventHandler;
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnection.class);
 
-
-    public IncomingConnection(Queue<String> q, Socket s) {
+    public IncomingConnection(Queue<String> q, Socket s, EventHandler h) {
         centralEventsQueue = q;
         clientSocket = s;
+        eventHandler = h;
     }
 
     public void run() {
@@ -47,6 +48,13 @@ public class IncomingConnection implements Runnable {
             try {
                 BufferedWriter out = new BufferedWriter(new
                         OutputStreamWriter(clientSocket.getOutputStream()));
+
+                event = eventHandler.processEvent(event);
+
+                if (event == null) {
+                    return;
+                }
+
                 out.write(event);
                 out.newLine();
                 out.flush();

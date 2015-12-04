@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import com.umermansoor.trafficdistributor.handlers.EventHandler;
 
 /**
  * Application entry point. Starts other classes.
@@ -29,9 +30,23 @@ public class App {
          */
         LinkedBlockingQueue<String> centralQueue = new LinkedBlockingQueue<String>(2000);
 
+        EventHandler noOpEventHandler = new EventHandler() {
+
+            /**
+             * Do nothing; Return the event.
+             *
+             * @param event
+             * @return event.
+             */
+            public String processEvent(String event) {
+                return event;
+            }
+
+        };
+
         CountDownLatch serverStartedSignal = new CountDownLatch(1);
         final IncomingConnectionsManager inboundConnectionManager = new IncomingConnectionsManager(
-                centralQueue, serverStartedSignal);
+                centralQueue, serverStartedSignal, noOpEventHandler);
         final Thread inboundThread = new Thread(inboundConnectionManager);
         inboundThread.start();
 
@@ -49,7 +64,7 @@ public class App {
         }
 
         final OutboundConnectionsManager outboundConnectionManager = new OutboundConnectionsManager(
-                hosts, centralQueue);
+                hosts, centralQueue, noOpEventHandler);
         final Thread outboundThread = new Thread(outboundConnectionManager);
         outboundThread.start();
 

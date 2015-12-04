@@ -3,10 +3,9 @@ package com.umermansoor.trafficdistributor.net;
 import com.umermansoor.trafficdistributor.config.Configuration;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.umermansoor.trafficdistributor.handlers.EventHandler;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -23,13 +22,15 @@ import java.util.concurrent.Executors;
  * @author umermansoor
  */
 public class OutboundConnectionsManager implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(OutboundConnectionsManager.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnectionsManager.class);
     private final List<Host> hosts;
-    private final Queue<String> centralQueue;
+    private final BlockingQueue<String> centralQueue;
+    private final EventHandler handler;
 
-    public OutboundConnectionsManager(List<Host> h, Queue<String> q) {
+    public OutboundConnectionsManager(List<Host> h, BlockingQueue<String> q, EventHandler eh) {
         hosts = h;
         centralQueue = q;
+        handler = eh;
     }
 
     public void run() {
@@ -37,7 +38,7 @@ public class OutboundConnectionsManager implements Runnable {
         ExecutorCompletionService<Host> ecs = new ExecutorCompletionService<Host>(pool);
 
         for (Host host : hosts) {
-            ecs.submit(new OutboundConnection(host, centralQueue), host);
+            ecs.submit(new OutboundConnection(host, centralQueue, handler), host);
         }
 
         while (!Thread.currentThread().isInterrupted()) {
@@ -47,7 +48,7 @@ public class OutboundConnectionsManager implements Runnable {
 
                 if (Configuration.CONNECTION_RETRY_FOREVER) {
                     Thread.sleep(Configuration.CONNECTION_RETRY_DELAY_SECONDS);
-                    ecs.submit(new OutboundConnection(disconnected, centralQueue), disconnected);
+                    ecs.submit(new OutboundConnection(disconnected, centralQueue, handler), disconnected);
                 }
 
             } catch (InterruptedException ie) {

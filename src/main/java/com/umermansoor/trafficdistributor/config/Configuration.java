@@ -29,4 +29,6 @@ public class Configuration {
     public static final int LISTENING_PORT = 7002;
 
     public static final int MAX_CLIENT_CONNECTIONS = 100;
+
+    public static final boolean TRACE_INCOMING_EVENTS = true;
 }
