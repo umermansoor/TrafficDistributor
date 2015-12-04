@@ -2,7 +2,7 @@ package com.umermansoor.trafficdistributor;
 
 import com.umermansoor.trafficdistributor.net.IncomingConnectionManager;
 import com.umermansoor.trafficdistributor.net.OutboundConnectionManager;
-import com.umermansoor.trafficdistributor.util.Host;
+import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

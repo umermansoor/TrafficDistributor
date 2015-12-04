@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor.util;
+package com.umermansoor.trafficdistributor.utils;
 
 /**
  * This class is used for representing a network end-point.
@@ -55,11 +55,7 @@ public class Host {
 
         Host otherHost = (Host)obj;
 
-        if (otherHost.hostname == hostname && otherHost.port == port) {
-            return true;
-        } else {
-            return false;
-        }
+        return otherHost.hostname == hostname && otherHost.port == port;
     }
 
     @Override

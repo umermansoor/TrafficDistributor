@@ -1,7 +1,7 @@
 package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.config.Configuration;
-import com.umermansoor.trafficdistributor.util.Host;
+import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public class OutboundConnectionManager implements Runnable {
                 logger.error("disconnected from {}.", disconnected.getHostname());
 
                 if (Configuration.CONNECTION_RETRY_FOREVER) {
-                    Thread.sleep(Configuration.CONNECTION_RETRY_DELAY);
+                    Thread.sleep(Configuration.CONNECTION_RETRY_DELAY_SECONDS);
                     ecs.submit(new OutboundConnection(disconnected, centralQueue), disconnected);
                 }
 

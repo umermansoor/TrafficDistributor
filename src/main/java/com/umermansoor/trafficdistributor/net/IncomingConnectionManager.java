@@ -11,7 +11,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Manages incoming TCP connections from clients.
+ * Manages incoming TCP connections from clients. When a client connects, it
+ * creates a new instance of {@link com.umermansoor.trafficdistributor.net.IncomingConnection}
+ * and hands-over the responsibility of communicating with this client for
+ * as long as the session is open.
  *
  * @author umer mansoor
  */

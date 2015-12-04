@@ -1,7 +1,7 @@
 package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.config.Configuration;
-import com.umermansoor.trafficdistributor.util.Host;
+import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class OutboundConnection implements Runnable {
         try {
             socket = new Socket(host.getHostname(), host.getPort());
             logger.debug("connected to {}", host);
-            socket.setSoTimeout(Configuration.SOCKET_TIMEOUT);
+            socket.setSoTimeout(Configuration.SOCKET_TIMEOUT_SECONDS);
 
             read(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         } catch (Exception e) {
