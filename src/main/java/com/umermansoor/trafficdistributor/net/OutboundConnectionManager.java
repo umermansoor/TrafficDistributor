@@ -17,7 +17,6 @@ import java.util.concurrent.Executors;
  * Manages Outbound connections.
  */
 public class OutboundConnectionManager implements Runnable {
-
     private static final Logger logger = LoggerFactory.getLogger(OutboundConnectionManager.class);
     private final List<Host> hosts;
     private final Queue<String> centralQueue;
@@ -46,7 +45,7 @@ public class OutboundConnectionManager implements Runnable {
                 }
 
             } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt(); // Allow the loop condition to fail.
+                break;
             } catch (ExecutionException ee) {
                 //TODO: Handle this
             }
@@ -54,6 +53,19 @@ public class OutboundConnectionManager implements Runnable {
         }
 
         pool.shutdownNow();
+
+        boolean closed = false;
+
+
+        try {
+            closed = pool.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) { /** Ignored because exiting **/}
+
+        if (closed) {
+            logger.info("successfully shutdown OutboundConnectionManager.");
+        } else {
+            logger.error("failed to properly shutdown OutboundConnectionManager.");
+        }
     }
 
 }

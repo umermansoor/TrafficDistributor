@@ -32,8 +32,9 @@ public class OutboundConnection implements Runnable {
     }
 
     private void connect() {
+        Socket socket = null;
         try {
-            Socket socket = new Socket(host.getHostname(), host.getPort());
+            socket = new Socket(host.getHostname(), host.getPort());
             logger.debug("connected to {}", host);
             socket.setSoTimeout(Configuration.SOCKET_TIMEOUT);
 
@@ -42,7 +43,16 @@ public class OutboundConnection implements Runnable {
             /**
              * Log the exception and give up.
              */
-            logger.error("Error connection to host {}.", host, e.toString());
+            logger.error("Error connecting to host {}. {}", host, e.toString());
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (java.io.IOException ioe) {
+                    logger.error("host {} socket not properly closed. {}",
+                            host, ioe.toString());
+                }
+            }
         }
     }
 
@@ -52,10 +62,11 @@ public class OutboundConnection implements Runnable {
         try {
             while ((json = in.readLine()) != null) {
                 logger.debug("received event: {}", json);
+                centralQueue.add(json);
             }
         } catch (Exception e) {
             // Log and give up
-            logger.debug("Error reading from {}.", host, e.toString());
+            logger.debug("Error reading from {}. {}", host, e.toString());
         }
 
     }
