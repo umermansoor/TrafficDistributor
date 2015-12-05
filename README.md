@@ -29,7 +29,7 @@ Quick Start
 
 #### 1. Build the project. 
 
-Go to the main project folder `/TrafficDistributor` and run the following command:
+Go to the main project folder `TrafficDistributor/` and run the following command:
 
 <code>
 $ mvn clean package
