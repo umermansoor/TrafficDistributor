@@ -19,29 +19,42 @@ events must be separated by new lines.
 Requirements
 ============
 
-* Java SE 7
-* Apache Maven 
+* Java SE 7.
+* Apache Maven.
 * Works on Linux, Windows, Mac OSX and (quite possibly) BSD.
+* Python (Optional, to run the supplied dummy server).
 
 Quick Start
 ===========
 
-To build the JAR file, go to the main project folder and run the following command:
+#### 1. Build the project. 
+
+Go to the main project folder `/TrafficDistributor` and run the following command:
 
 <code>
 $ mvn clean package
 </code>
 
-To execute the JAR file:
+#### 2. Start the dummy server
+
+A dummy server is provided which sends random JSON strings to clients over TCP. To start the server:
+
+<code>
+$ python2.7 tools/dummy_server.py &
+</code>
+
+Note: Read the Settings section below to learn how to configure this app to connect to your servers.
+
+#### 3. Run the app
 
 <code>
 $ java -jar target/TrafficDistributor-1.0-SNAPSHOT-jar-with-dependencies.jar
 </code>
 
-To kill the server once it is running, press `CTRL+C`.
+To stop the app once it is running, press `CTRL+C`.
 
 Settings
-=============
+========
 
 Modify class `com.umermansoor.trafficdistributor.config.Configuration` to change settings.
 

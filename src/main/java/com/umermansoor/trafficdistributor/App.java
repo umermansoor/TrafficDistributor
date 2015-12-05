@@ -2,10 +2,8 @@ package com.umermansoor.trafficdistributor;
 
 import com.umermansoor.trafficdistributor.net.IncomingConnectionsManager;
 import com.umermansoor.trafficdistributor.net.OutboundConnectionsManager;
-import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -17,11 +15,13 @@ import java.util.concurrent.TimeUnit;
 public class App {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(App.class);
+    private static final String name = "JSON TCP Distributor";
+    private static final String version = "v0.1";
+
 
     public static void main(String[] args) {
-        ArrayList<Host> hosts = new ArrayList<Host>(1);
-        hosts.add(new Host("localhost", 6001));
-        hosts.add(new Host("localhost", 6001));
+
+        System.out.println(name + version);
 
         CountDownLatch serverStartedSignal = new CountDownLatch(1);
         final IncomingConnectionsManager inboundConnectionManager = new
@@ -34,7 +34,7 @@ public class App {
             boolean started = serverStartedSignal.await(5, TimeUnit.SECONDS);
             if (!started) {
                 logger.debug("could not start internal server for accepting client connections. " +
-                        " Port already in use? Quitting application.");
+                        "port already in use? Quitting application.");
                 inboundThread.interrupt();
                 inboundThread.join();
                 return;
@@ -43,7 +43,7 @@ public class App {
         }
 
         final OutboundConnectionsManager outboundConnectionManager = new
-                OutboundConnectionsManager(hosts);
+                OutboundConnectionsManager();
         final Thread outboundThread = new Thread(outboundConnectionManager);
         outboundThread.start();
 
