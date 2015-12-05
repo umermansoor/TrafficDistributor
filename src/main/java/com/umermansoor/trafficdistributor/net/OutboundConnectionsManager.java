@@ -22,11 +22,7 @@ import java.util.concurrent.Executors;
  */
 public class OutboundConnectionsManager implements Runnable {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnectionsManager.class);
-    private final List<Host> hosts;
-
-    public OutboundConnectionsManager(List<Host> h) {
-        hosts = h;
-    }
+    private final List<Host> hosts = Configuration.servers;
 
     public void run() {
         ExecutorService pool = Executors.newFixedThreadPool(hosts.size());
