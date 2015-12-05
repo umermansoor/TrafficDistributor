@@ -2,7 +2,7 @@ package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
 import com.umermansoor.trafficdistributor.config.Configuration;
-import com.umermansoor.trafficdistributor.handlers.EventHandler;
+import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 
@@ -24,7 +24,7 @@ public class OutboundConnection implements Runnable {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnection.class);
     private final Host host;
     private final EventCollector collector = Configuration.EVENTS_COLLECTOR;
-    private final EventHandler eventHandler = EventHandler.getInstance();
+    private final EventTransformer eventTransformer = EventTransformer.getInstance();
 
     public OutboundConnection(Host h) {
         host = h;
@@ -67,7 +67,7 @@ public class OutboundConnection implements Runnable {
                 logger.debug("received event: {}", json);
             }
 
-            json = eventHandler.processEvent(json);
+            json = eventTransformer.processEvent(json);
             // Skip the event is the handler returned null.
             if (json == null) {
                 continue;

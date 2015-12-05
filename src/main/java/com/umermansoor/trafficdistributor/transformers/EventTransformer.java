@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor.handlers;
+package com.umermansoor.trafficdistributor.transformers;
 
 /**
  * This is used to filter or transform events either at the time they are
@@ -6,16 +6,16 @@ package com.umermansoor.trafficdistributor.handlers;
  *
  * @author umermansoor
  */
-public class EventHandler {
-    private static EventHandler instance = null;
+public class EventTransformer {
+    private static EventTransformer instance = null;
 
-    private EventHandler() {
+    private EventTransformer() {
 
     }
 
-    public static EventHandler getInstance() {
+    public static EventTransformer getInstance() {
         if (instance == null) {
-            instance = new EventHandler();
+            instance = new EventTransformer();
         }
 
         return instance;

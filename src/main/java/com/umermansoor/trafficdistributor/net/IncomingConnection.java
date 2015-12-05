@@ -2,7 +2,7 @@ package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
 import com.umermansoor.trafficdistributor.config.Configuration;
-import com.umermansoor.trafficdistributor.handlers.EventHandler;
+import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import org.slf4j.Logger;
 
 import java.io.BufferedWriter;
@@ -24,7 +24,7 @@ public class IncomingConnection implements Runnable {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnection.class);
     private final Socket clientSocket;
-    private final EventHandler eventHandler = EventHandler.getInstance();
+    private final EventTransformer eventTransformer = EventTransformer.getInstance();
     private final EventCollector collector = Configuration.EVENTS_COLLECTOR;
 
     public IncomingConnection(Socket s) {
@@ -54,7 +54,7 @@ public class IncomingConnection implements Runnable {
                 BufferedWriter out = new BufferedWriter(new
                         OutputStreamWriter(clientSocket.getOutputStream()));
 
-                json = eventHandler.processEvent(json);
+                json = eventTransformer.processEvent(json);
 
                 if (json != null) {
                     out.write(json);

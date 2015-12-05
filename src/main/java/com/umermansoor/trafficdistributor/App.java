@@ -21,6 +21,7 @@ public class App {
     public static void main(String[] args) {
         ArrayList<Host> hosts = new ArrayList<Host>(1);
         hosts.add(new Host("localhost", 6001));
+        hosts.add(new Host("localhost", 6001));
 
         CountDownLatch serverStartedSignal = new CountDownLatch(1);
         final IncomingConnectionsManager inboundConnectionManager = new

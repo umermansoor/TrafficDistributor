@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A blocking collector which discards new events when attempting to store them
+ * A blocking collector which rejects new events when attempting to store them
  * into this collector and it is full.
  * <p/>
  * This class is thread-safe.
@@ -22,7 +22,7 @@ public class DiscardNewestBlockingCollector extends BlockingCollector {
 
     /**
      * Stores the given event to this collector. If there is no more room, it
-     * discards the given event and returns false.
+     * rejects the given event and returns false.
      * <p/>
      * Won't accept null event.
      *
