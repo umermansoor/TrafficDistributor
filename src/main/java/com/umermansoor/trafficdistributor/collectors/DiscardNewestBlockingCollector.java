@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A blocking collector which rejects new events when attempting to store them
  * into this collector and it is full.
- * <p/>
+ *
  * This class is thread-safe.
  *
  * @author umermansoor

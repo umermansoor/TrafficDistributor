@@ -1,8 +1,10 @@
 package com.umermansoor.trafficdistributor.transformers;
 
 /**
- * This is used to filter or transform events either at the time they are
- * received, or before they are sent to a client.
+ * This class is given an opportunity to transform or filter an event when it
+ * is received but before it is stored in the collector.
+ *
+ * TODO: Modify this to add your own business logic or behavior.
  *
  * @author umermansoor
  */
@@ -22,9 +24,11 @@ public class EventTransformer {
     }
 
     /**
-     * This method is called when an event is received and before it is sent to
-     * the collector. Place your business logic here to transform the event or
-     * apply a filter. To drop events, simply returned null.
+     * This method is called when an event is received and before it is stored
+     * in the collector. Place your business logic here to transform the event,
+     * apply a filter or to keep metrics.
+     *
+     * To drop the given event, return null.
      *
      * @param event
      * @return processed event or null
