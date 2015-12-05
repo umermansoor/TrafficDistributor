@@ -1,8 +1,9 @@
-package com.umermansoor.trafficdistributor.util;
+package com.umermansoor.trafficdistributor.utils;
 
-import com.umermansoor.trafficdistributor.util.Host;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class HostTest {
 

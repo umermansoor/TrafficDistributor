@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor.util;
+package com.umermansoor.trafficdistributor.utils;
 
 /**
  * This class is used for representing a network end-point.
@@ -13,8 +13,8 @@ public class Host {
 
     /**
      * Constructor
-     * @param hostname
-     * @param port
+     * @param hostname Hostname or ip address
+     * @param port Tcp port.
      */
     public Host(String hostname, int port) {
 
@@ -49,17 +49,13 @@ public class Host {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Host == false) {
+        if ( !(obj instanceof Host )) {
             return false;
         }
 
         Host otherHost = (Host)obj;
 
-        if (otherHost.hostname == hostname && otherHost.port == port) {
-            return true;
-        } else {
-            return false;
-        }
+        return otherHost.hostname.equals(hostname) && otherHost.port == port;
     }
 
     @Override
