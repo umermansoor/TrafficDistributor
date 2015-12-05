@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import com.umermansoor.trafficdistributor.handlers.EventHandler;
 
 /**
  * Application entry point. Starts other classes.
@@ -24,29 +22,9 @@ public class App {
         ArrayList<Host> hosts = new ArrayList<Host>(1);
         hosts.add(new Host("localhost", 6001));
 
-        /**
-         * The central queue where events received from servers are stored and
-         * are consumed by client tasks.
-         */
-        LinkedBlockingQueue<String> centralQueue = new LinkedBlockingQueue<String>(2000);
-
-        EventHandler noOpEventHandler = new EventHandler() {
-
-            /**
-             * Do nothing; Return the event.
-             *
-             * @param event
-             * @return event.
-             */
-            public String processEvent(String event) {
-                return event;
-            }
-
-        };
-
         CountDownLatch serverStartedSignal = new CountDownLatch(1);
-        final IncomingConnectionsManager inboundConnectionManager = new IncomingConnectionsManager(
-                centralQueue, serverStartedSignal, noOpEventHandler);
+        final IncomingConnectionsManager inboundConnectionManager = new
+                IncomingConnectionsManager(serverStartedSignal);
         final Thread inboundThread = new Thread(inboundConnectionManager);
         inboundThread.start();
 
@@ -63,8 +41,8 @@ public class App {
         } catch (InterruptedException ignored) {
         }
 
-        final OutboundConnectionsManager outboundConnectionManager = new OutboundConnectionsManager(
-                hosts, centralQueue, noOpEventHandler);
+        final OutboundConnectionsManager outboundConnectionManager = new
+                OutboundConnectionsManager(hosts);
         final Thread outboundThread = new Thread(outboundConnectionManager);
         outboundThread.start();
 

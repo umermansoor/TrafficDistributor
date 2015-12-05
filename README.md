@@ -1,14 +1,19 @@
-# Traffic Director
+# JSON TCP Distributor
 
 Overview
 ========
-Traffic Director splits incoming events from multiple **servers** to multiple **clients**. 
+JSON TCP Distributor is used for efficiently distributing incoming JSON events over TCP across multiple back-end 
+nodes. 
 
 ![alt tag](docs/overall_idea.png)
 
-It establishes TCP connections with servers. The incoming events (new line separated strings) are placed in a 
-central queue. When a client connects, the events from the queue are sent to it. Traffic Director supports multiple 
-clients and an event distribution policy is applied in that case.
+Use this app if you need to: 
+1. Connect to one or more JSON producing servers which send a continuous stream of JSON (or CSV or Strings), and,
+2. Optionally filter or transform incoming events (e.g. apply throttle, drop invalid, tag etc.), and,
+3. Distributed incoming events to two or more back-end nodes.
+ 
+JSON TCP Distributor works with JSON, but will also work with CSV or any String. The only requirement is that the
+events must be separated by new lines.
 
 Requirements
 ============
@@ -20,7 +25,17 @@ Requirements
 Install
 =======
 
-Maven... #TODO
+To build the JAR file, go to the main project folder and run the following command:
+
+<code>
+$ mvn clean package
+</code>
+
+To execute the JAR file:
+
+<code>
+$ java -jar target/TrafficDistributor-1.0-SNAPSHOT-jar-with-dependencies.jar
+</code>
 
 Why not use a Message Broker or Messaging Middleware?
 =====================================================

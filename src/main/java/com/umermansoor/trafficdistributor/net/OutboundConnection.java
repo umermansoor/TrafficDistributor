@@ -1,13 +1,14 @@
 package com.umermansoor.trafficdistributor.net;
 
+import com.umermansoor.trafficdistributor.collectors.EventCollector;
 import com.umermansoor.trafficdistributor.config.Configuration;
+import com.umermansoor.trafficdistributor.handlers.EventHandler;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
-import com.umermansoor.trafficdistributor.handlers.EventHandler;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Task for handling communication with an outbound socket. The socket
@@ -20,16 +21,13 @@ import java.util.concurrent.TimeUnit;
  * @author umermansoor
  */
 public class OutboundConnection implements Runnable {
-    private final Host host;
-    private final BlockingQueue<String> centralQueue;
-    private final EventHandler eventHandler;
-
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnection.class);
+    private final Host host;
+    private final EventCollector collector = Configuration.EVENTS_COLLECTOR;
+    private final EventHandler eventHandler = EventHandler.getInstance();
 
-    public OutboundConnection(Host h, BlockingQueue<String> q, EventHandler eh) {
+    public OutboundConnection(Host h) {
         host = h;
-        centralQueue = q;
-        eventHandler = eh;
     }
 
     public void run() {
@@ -59,29 +57,23 @@ public class OutboundConnection implements Runnable {
         }
     }
 
-    private void read(BufferedReader in) {
-        String json;
-
-        try {
-            while ((json = in.readLine()) != null || !Thread.currentThread().isInterrupted()) {
-                if (Configuration.TRACE_INCOMING_EVENTS) {
-                    logger.debug("received event: {}", json);
-                }
-
-                json = eventHandler.processEvent(json);
-                // Skip the event is the handler returned null.
-                if (json == null) {
-                    continue;
-                }
-
-                if (!centralQueue.offer(json, 1, TimeUnit.SECONDS)) {
-                    logger.error("queue full. no or slow clients connected? dropped event {}.", json);
-                }
+    private void read(BufferedReader in) throws InterruptedException, IOException {
+        while (!Thread.currentThread().isInterrupted()) {
+            String json = in.readLine();
+            if (json == null) {
+                continue;
             }
-        } catch (Exception e) {
-            // Log and give up
-            logger.debug("error reading from {}. {}", host, e.toString());
-        }
+            if (Configuration.TRACE_INCOMING_EVENTS) {
+                logger.debug("received event: {}", json);
+            }
 
+            json = eventHandler.processEvent(json);
+            // Skip the event is the handler returned null.
+            if (json == null) {
+                continue;
+            }
+
+            collector.put(json);
+        }
     }
 }

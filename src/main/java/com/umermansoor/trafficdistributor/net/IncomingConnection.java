@@ -1,12 +1,14 @@
 package com.umermansoor.trafficdistributor.net;
 
-import org.slf4j.Logger;
+import com.umermansoor.trafficdistributor.collectors.EventCollector;
+import com.umermansoor.trafficdistributor.config.Configuration;
 import com.umermansoor.trafficdistributor.handlers.EventHandler;
+import org.slf4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.Queue;
 
 /**
  * Task for handling communication with an incoming socket. The socket
@@ -19,23 +21,26 @@ import java.util.Queue;
  * @author umermansoor
  */
 public class IncomingConnection implements Runnable {
-    private final Queue<String> centralEventsQueue;
-    private final Socket clientSocket;
-    private final EventHandler eventHandler;
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnection.class);
+    private final Socket clientSocket;
+    private final EventHandler eventHandler = EventHandler.getInstance();
+    private final EventCollector collector = Configuration.EVENTS_COLLECTOR;
 
-    public IncomingConnection(Queue<String> q, Socket s, EventHandler h) {
-        centralEventsQueue = q;
+    public IncomingConnection(Socket s) {
         clientSocket = s;
-        eventHandler = h;
     }
 
     public void run() {
-        String event;
+        String json;
         while (!Thread.currentThread().isInterrupted()) {
-            event = centralEventsQueue.poll();
-            if (event == null) {
+            try {
+                json = collector.get();
+            } catch (InterruptedException ie) {
+                break;
+            }
+
+            if (json == null) {
                 continue;
             }
 
@@ -49,18 +54,17 @@ public class IncomingConnection implements Runnable {
                 BufferedWriter out = new BufferedWriter(new
                         OutputStreamWriter(clientSocket.getOutputStream()));
 
-                event = eventHandler.processEvent(event);
+                json = eventHandler.processEvent(json);
 
-                if (event == null) {
-                    return;
+                if (json != null) {
+                    out.write(json);
+                    out.newLine();
+                    out.flush();
                 }
-
-                out.write(event);
-                out.newLine();
-                out.flush();
             } catch (IOException ioe) {
-                logger.error("ioexception sending event to {}. {}",
+                logger.error("exception sending json to {}. {}",
                         clientSocket.getInetAddress().getHostAddress(), ioe.toString());
+                break; // Fail-fast. Clients should reconnect.
             }
         }
 
