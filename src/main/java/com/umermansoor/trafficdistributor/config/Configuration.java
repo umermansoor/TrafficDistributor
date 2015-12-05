@@ -4,8 +4,6 @@ import com.umermansoor.trafficdistributor.collectors.DiscardOldestBlockingCollec
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
 import com.umermansoor.trafficdistributor.utils.Host;
 
-import java.util.ArrayList;
-
 
 /**
  * This class contains configuration parameters for this application.
@@ -13,7 +11,16 @@ import java.util.ArrayList;
  * @author umer mansoor
  */
 public class Configuration {
-
+    /**
+     * Specify one or more servers to connect to.
+     */
+    public static final Host[] servers = new Host[]{
+            // The host information below is for demo purposes. The supplied
+            // demo server, `tools/dummy_server.py` runs on these ports if
+            // started. Provide your own hosts here.
+            new Host("localhost", 6001),
+            new Host("localhost", 6001)
+    };
 
     /**
      * Number of seconds the socket can remain idle waiting to receive data
@@ -31,7 +38,6 @@ public class Configuration {
      */
     public static final int CONNECTION_RETRY_DELAY_SECONDS = 5 * 1000;
 
-    public static final ArrayList<Host> servers = new ArrayList<Host>(2);
     /**
      * Port for accepting incoming connections from clients.
      */
@@ -48,11 +54,5 @@ public class Configuration {
      */
     public static final EventCollector EVENTS_COLLECTOR = new
             DiscardOldestBlockingCollector(COLLECTOR_CAPACITY);
-
-    static {
-        servers.add(new Host("localhost", 6001));
-        servers.add(new Host("localhost", 6001));
-    }
-
 
 }

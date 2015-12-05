@@ -5,7 +5,12 @@ import org.slf4j.Logger;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * A blocking collector used for storing events.
+ * A basic blocking collector used for storing events.
+ *
+ * This is ideal if you want to throttle event producers (servers) by applying
+ * back-pressure.
+ *
+ * This class is thread-safe.
  *
  * @author umermansoor
  */

@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 /**
  * A blocking collector which discards new events when attempting to store them
  * into this collector and it is full.
- * <p/>
+ *
  * This class is thread-safe.
  *
  * @author umermansoor

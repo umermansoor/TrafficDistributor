@@ -1,5 +1,6 @@
 package com.umermansoor.trafficdistributor;
 
+import com.umermansoor.trafficdistributor.config.Configuration;
 import com.umermansoor.trafficdistributor.net.IncomingConnectionsManager;
 import com.umermansoor.trafficdistributor.net.OutboundConnectionsManager;
 import org.slf4j.Logger;
@@ -8,7 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Application entry point. Starts other classes.
+ * Application entry point. Starts other classes to run the app.
  *
  * @author umer mansoor
  */
@@ -23,6 +24,11 @@ public class App {
 
         System.out.println(name + version);
 
+        if (Configuration.servers.length == 0) {
+            logger.debug("no servers were found in the configuration to connect with. quitting");
+            return;
+        }
+
         CountDownLatch serverStartedSignal = new CountDownLatch(1);
         final IncomingConnectionsManager inboundConnectionManager = new
                 IncomingConnectionsManager(serverStartedSignal);
@@ -34,7 +40,7 @@ public class App {
             boolean started = serverStartedSignal.await(5, TimeUnit.SECONDS);
             if (!started) {
                 logger.debug("could not start internal server for accepting client connections. " +
-                        "port already in use? Quitting application.");
+                        "port already in use? quitting application");
                 inboundThread.interrupt();
                 inboundThread.join();
                 return;
@@ -54,7 +60,7 @@ public class App {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                logger.info("shutdown initiated.");
+                logger.info("shutdown initiated");
                 outboundThread.interrupt();
                 inboundConnectionManager.cancelTask();
 
@@ -64,7 +70,7 @@ public class App {
                 } catch (InterruptedException ignored) {
                 }
 
-                logger.info("shutdown completed. good bye.");
+                logger.info("shutdown complete");
             }
         });
     }

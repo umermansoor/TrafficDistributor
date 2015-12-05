@@ -98,8 +98,25 @@ was because I often needed similar functionality when building a large mission c
 multiple 3rd party servers sending event streams (thousands of events per second). 
 Those events were to be filtered, transformed and distributed before being sent to a cluster of back-end nodes 
 for further processing.
- 
 
+## Where to specify the servers this app should connect to in order to receive data?
+
+You can specify this and any other configuration information in the configuration class in 
+`src/main/java/com/umermansoor/trafficdistributor/config/Configuration.java`
+
+## Is this project suitable for running in the background as a service?
+
+Yes. By default, it will automatically re-establish with the servers if the connection is lost. All collectors are
+designed to work even when they are full. By default, the app uses `DiscardOldestBlockingCollector` which will 
+discard oldest events if the collector is full (this might happen if no clients are connected to consume events).
+
+ 
+Known Issues
+============
+
+* Does not detect and deal with TCP Half-Open Connections. For example, if the client (events receiver) process 
+crashes and the socket is abruptly closed, the app may not detect the failure and continue to send events which
+may result in a loss of data. Implement a PING-PONG or another keep-alive mechanism.
 
 
 

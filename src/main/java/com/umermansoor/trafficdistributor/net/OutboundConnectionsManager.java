@@ -4,7 +4,6 @@ import com.umermansoor.trafficdistributor.config.Configuration;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -22,10 +21,10 @@ import java.util.concurrent.Executors;
  */
 public class OutboundConnectionsManager implements Runnable {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnectionsManager.class);
-    private final List<Host> hosts = Configuration.servers;
+    private final Host[] hosts = Configuration.servers;
 
     public void run() {
-        ExecutorService pool = Executors.newFixedThreadPool(hosts.size());
+        ExecutorService pool = Executors.newFixedThreadPool(hosts.length);
         ExecutorCompletionService<Host> ecs = new ExecutorCompletionService<Host>(pool);
 
         for (Host host : hosts) {
@@ -67,5 +66,4 @@ public class OutboundConnectionsManager implements Runnable {
             logger.error("failed to properly shutdown OutboundConnectionsManager.");
         }
     }
-
 }
