@@ -31,6 +31,7 @@ public class BlockingCollector implements EventCollector {
         return true;
     }
 
+
     public int size() {
         return eventsQueue.size();
     }
