@@ -21,14 +21,21 @@ import java.util.concurrent.Executors;
  */
 public class OutboundConnectionsManager implements Runnable {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnectionsManager.class);
-    private final Host[] hosts = Configuration.servers;
+    private final Host[] hosts;
+    private final Configuration config;
+
+    public OutboundConnectionsManager(Configuration c) {
+        config = c;
+        hosts = c.servers;
+    }
 
     public void run() {
         ExecutorService pool = Executors.newFixedThreadPool(hosts.length);
         ExecutorCompletionService<Host> ecs = new ExecutorCompletionService<Host>(pool);
 
         for (Host host : hosts) {
-            ecs.submit(new OutboundConnection(host), host);
+            ecs.submit(new OutboundConnection(host, config.EVENTS_COLLECTOR,
+                    config.EVENTS_TRANSFORMER, config.SOCKET_TIMEOUT_SECONDS), host);
         }
 
         while (!Thread.currentThread().isInterrupted()) {
@@ -36,9 +43,10 @@ public class OutboundConnectionsManager implements Runnable {
                 Host disconnected = ecs.take().get();
                 logger.error("disconnected from {}.", disconnected.getHostname());
 
-                if (Configuration.CONNECTION_RETRY_FOREVER) {
-                    Thread.sleep(Configuration.CONNECTION_RETRY_DELAY_SECONDS);
-                    ecs.submit(new OutboundConnection(disconnected), disconnected);
+                if (config.CONNECTION_RETRY_FOREVER) {
+                    Thread.sleep(config.CONNECTION_RETRY_DELAY_SECONDS);
+                    ecs.submit(new OutboundConnection(disconnected, config.EVENTS_COLLECTOR,
+                            config.EVENTS_TRANSFORMER, config.SOCKET_TIMEOUT_SECONDS), disconnected);
                 }
 
             } catch (InterruptedException ie) {

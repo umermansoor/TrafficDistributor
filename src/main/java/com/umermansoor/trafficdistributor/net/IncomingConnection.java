@@ -24,11 +24,13 @@ public class IncomingConnection implements Runnable {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnection.class);
     private final Socket clientSocket;
-    private final EventTransformer eventTransformer = EventTransformer.getInstance();
-    private final EventCollector collector = Configuration.EVENTS_COLLECTOR;
+    private final EventTransformer eventTransformer;
+    private final EventCollector collector;
 
-    public IncomingConnection(Socket s) {
+    public IncomingConnection(Socket s, Configuration c) {
         clientSocket = s;
+        collector = c.EVENTS_COLLECTOR;
+        eventTransformer = c.EVENTS_TRANSFORMER;
     }
 
     public void run() {

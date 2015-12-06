@@ -1,7 +1,6 @@
 package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
-import com.umermansoor.trafficdistributor.config.Configuration;
 import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
@@ -23,11 +22,16 @@ import java.net.Socket;
 public class OutboundConnection implements Runnable {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnection.class);
     private final Host host;
-    private final EventCollector collector = Configuration.EVENTS_COLLECTOR;
-    private final EventTransformer eventTransformer = EventTransformer.getInstance();
+    private final EventCollector collector;
+    private final EventTransformer eventTransformer;
+    private final int readTimeInSeconds;
+    private Socket socket;
 
-    public OutboundConnection(Host h) {
+    public OutboundConnection(Host h, EventCollector cl, EventTransformer et, int timeout) {
         host = h;
+        collector = cl;
+        eventTransformer = et;
+        readTimeInSeconds = timeout;
     }
 
     public void run() {
@@ -35,11 +39,11 @@ public class OutboundConnection implements Runnable {
     }
 
     private void connect() {
-        Socket socket = null;
+
         try {
             socket = new Socket(host.getHostname(), host.getPort());
             logger.debug("connected to {}", host);
-            socket.setSoTimeout(Configuration.SOCKET_TIMEOUT_SECONDS);
+            socket.setSoTimeout(readTimeInSeconds);
 
             read(new BufferedReader(new java.io.InputStreamReader(socket.getInputStream())));
         } catch (Exception e) {
@@ -63,9 +67,9 @@ public class OutboundConnection implements Runnable {
             if (json == null) {
                 continue;
             }
-            if (Configuration.TRACE_INCOMING_EVENTS) {
-                logger.debug("received event: {}", json);
-            }
+
+            logger.trace("received event: {}", json);
+
 
             json = eventTransformer.processEvent(json);
             // Skip the event is the handler returned null.
@@ -76,4 +80,5 @@ public class OutboundConnection implements Runnable {
             collector.put(json);
         }
     }
+
 }

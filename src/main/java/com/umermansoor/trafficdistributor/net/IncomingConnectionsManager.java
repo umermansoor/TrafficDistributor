@@ -19,12 +19,15 @@ import java.util.concurrent.Executors;
  */
 public class IncomingConnectionsManager implements Runnable {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IncomingConnectionsManager.class);
-    private final ExecutorService pool = Executors.newFixedThreadPool(Configuration.MAX_CLIENT_CONNECTIONS);
+    private final ExecutorService pool;
     private final CountDownLatch serverStartedSignal;
+    private final Configuration config;
     private ServerSocket server;
 
-    public IncomingConnectionsManager(CountDownLatch l) {
+    public IncomingConnectionsManager(CountDownLatch l, Configuration c) {
         serverStartedSignal = l;
+        config = c;
+        pool = Executors.newFixedThreadPool(c.MAX_CLIENT_CONNECTIONS);
     }
 
     public void run() {
@@ -37,15 +40,15 @@ public class IncomingConnectionsManager implements Runnable {
      */
     private void startServer() {
         try {
-            server = new ServerSocket(Configuration.LISTENING_PORT);
+            server = new ServerSocket(config.LISTENING_PORT);
         } catch (Exception e) {
-            logger.error("failed to bind to port {}. {}", Configuration.LISTENING_PORT, e.toString());
+            logger.error("failed to bind to port {}. {}", config.LISTENING_PORT, e.toString());
             return;
         }
 
         serverStartedSignal.countDown();
 
-        logger.debug("listening on port {} for clients.", Configuration.LISTENING_PORT);
+        logger.debug("listening on port {} for clients.", config.LISTENING_PORT);
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
@@ -53,7 +56,7 @@ public class IncomingConnectionsManager implements Runnable {
                 Socket client = server.accept();
                 logger.debug("new client connected {}.", client.getInetAddress().getHostAddress());
                 // Pass the client socket to the handler thread.
-                pool.submit(new IncomingConnection(client));
+                pool.submit(new IncomingConnection(client, config));
             } catch (java.io.IOException ioe) {
                 logger.error("{}", ioe.toString());
                 break;
@@ -80,7 +83,7 @@ public class IncomingConnectionsManager implements Runnable {
     }
 
     /**
-     * Normally to cancel a task(Runnable), we send am interrupt signal. But
+     * Normally to cancel a task(Runnable), we send an interrupt signal. But
      * the call to `ServerSocket.accept()` ignores interrupt and blocks until a
      * connection request is received. As a work around, this method closes the
      * underlying `Socket` forcing the `accept()` method to throw an exception,

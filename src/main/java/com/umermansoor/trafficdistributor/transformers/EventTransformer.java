@@ -9,19 +9,11 @@ package com.umermansoor.trafficdistributor.transformers;
  * @author umermansoor
  */
 public class EventTransformer {
-    private static EventTransformer instance = null;
 
-    private EventTransformer() {
+    public EventTransformer() {
 
     }
 
-    public static EventTransformer getInstance() {
-        if (instance == null) {
-            instance = new EventTransformer();
-        }
-
-        return instance;
-    }
 
     /**
      * This method is called when an event is received and before it is stored

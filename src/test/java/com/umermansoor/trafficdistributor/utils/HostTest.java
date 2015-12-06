@@ -35,6 +35,7 @@ public class HostTest {
         assertEquals("failure - hashcodes are not equal", h1.hashCode(), h2.hashCode());
     }
 
+    @Test
     public void testInvalidCreation() throws NullPointerException, IllegalArgumentException {
         thrown.expect(NullPointerException.class);
         new Host(null, 1);
