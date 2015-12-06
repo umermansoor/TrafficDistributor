@@ -1,4 +1,4 @@
-# JSON TCP Distributor [![Build Status](https://travis-ci.org/umermansoor/TrafficDistributor.svg?branch=master)](https://travis-ci.org/umermansoor/TrafficDistributor)
+# JSON TCP Distributor [![Build Status](https://travis-ci.org/umermansoor/TrafficDistributor.svg?branch=master)](https://travis-ci.org/umermansoor/TrafficDistributor) [![codecov.io](https://codecov.io/github/umermansoor/TrafficDistributor/coverage.svg?branch=master)](https://codecov.io/github/umermansoor/TrafficDistributor?branch=master)
 
 Overview
 ========
