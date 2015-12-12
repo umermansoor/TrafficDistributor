@@ -43,9 +43,19 @@ public class OutboundConnectionsManager implements Runnable {
             ecs.submit(new OutboundConnection(host, collector, transformer), host);
         }
 
-        while (!Thread.currentThread().isInterrupted()) {
+        // Shutdown the pool once all outbound connections tasks are finished
+        // if we are not required to retry connection upon disconnect. This
+        // will prevent this thread from running forever when no tasks are
+        // running or could be run.
+        if (!retryForever) {
+            pool.shutdown();
+        }
+
+        while (!Thread.currentThread().isInterrupted() && !pool.isTerminated()) {
+
             try {
                 Host disconnected = ecs.take().get();
+
                 logger.error("disconnected from {}.", disconnected.getHostname());
 
                 if (retryForever) {
