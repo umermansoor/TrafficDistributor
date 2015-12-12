@@ -17,8 +17,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class OutboundConnectionsManagerIT {
 
-    private final int portServer1 = 3333;
-    private final int portServer2 = 3334;
+    private final int portServer1 = 3334;
+    private final int portServer2 = 3335;
 
     private MockServer mockServer1;
     private MockServer mockServer2;
@@ -55,7 +55,7 @@ public class OutboundConnectionsManagerIT {
 
 
         try {
-            t.join(500);
+            t.join(1500);
         } catch (InterruptedException ie) {
         }
 
