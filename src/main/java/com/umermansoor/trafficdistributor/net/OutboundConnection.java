@@ -1,6 +1,7 @@
 package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
+import com.umermansoor.trafficdistributor.config.TcpSocket;
 import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
@@ -24,14 +25,14 @@ public class OutboundConnection implements Runnable {
     private final Host host;
     private final EventCollector collector;
     private final EventTransformer eventTransformer;
-    private final int readTimeInSeconds;
+    private final int readTimeInSeconds = TcpSocket.SOCKET_TIMEOUT_SECONDS;
     private Socket socket;
 
-    public OutboundConnection(Host h, EventCollector cl, EventTransformer et, int timeout) {
+    public OutboundConnection(Host h, EventCollector cl, EventTransformer et) {
         host = h;
         collector = cl;
         eventTransformer = et;
-        readTimeInSeconds = timeout;
+
     }
 
     public void run() {

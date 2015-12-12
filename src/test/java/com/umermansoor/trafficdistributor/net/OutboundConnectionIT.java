@@ -14,23 +14,27 @@ import java.util.concurrent.Executors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-
+/**
+ * Integrations Tests for {@link OutboundConnection}.
+ * It uses {@link MockServer} to start a mock TCP server.
+ *
+ * @author umermansoor
+ */
 public class OutboundConnectionIT {
     private final int mockServerPort = 3333;
-    private Thread serverThread;
+    MockServer mockServer;
 
     @Before
     public void setUp() {
         // Start a server
-        serverThread = new MockServer(mockServerPort);
-        serverThread.start();
+        mockServer = new MockServer(mockServerPort);
+        mockServer.start();
     }
 
     @Test
-    public void testHost() {
-
-        // Create an EventTransformer which returns the same event back
-        // without any modification.
+    public void connectWithMockServer_VerifyEventsAreReceived() {
+        // Create an EventTransformer which returns the same event back without
+        // modifications.
         final EventTransformer transformer = new EventTransformer() {
 
             @Override
@@ -42,7 +46,7 @@ public class OutboundConnectionIT {
         final EventCollector collector = new BlockingCollector(100);
 
         OutboundConnection oc = new OutboundConnection(new Host("localhost",
-                mockServerPort), collector, transformer, 18);
+                mockServerPort), collector, transformer);
 
         ExecutorService threadRunner = Executors.newSingleThreadExecutor();
         threadRunner.submit(oc, true);
@@ -63,13 +67,22 @@ public class OutboundConnectionIT {
         threadRunner.shutdownNow();
     }
 
+    @Test
+    public void useTransformer_VerifyEventsGetTransformed() {
+
+        // TODO: Create an event transformer that adds a json field to all
+        // incoming events
+
+        // TODO: Create an event transformer that drops every second event
+        // by returning null
+    }
+
     @After
     public void tearDown() {
-        serverThread.interrupt();
+        mockServer.interrupt();
         try {
-            serverThread.join(500);
+            mockServer.join(500);
         } catch (Exception e) {
         }
-
     }
 }

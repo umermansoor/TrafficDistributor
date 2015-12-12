@@ -86,7 +86,7 @@ public class IncomingConnectionsManager implements Runnable {
      * Normally to cancel a task(Runnable), we send an interrupt signal. But
      * the call to `ServerSocket.accept()` ignores interrupt and blocks until a
      * connection request is received. As a work around, this method closes the
-     * underlying `Socket` forcing the `accept()` method to throw an exception,
+     * underlying `TcpSocket` forcing the `accept()` method to throw an exception,
      * giving the current thread a chance to process the interrupt request.
      */
     public synchronized void cancelTask() {

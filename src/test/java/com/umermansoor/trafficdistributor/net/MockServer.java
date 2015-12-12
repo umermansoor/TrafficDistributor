@@ -23,6 +23,8 @@ public class MockServer extends Thread {
     };
 
     private final int port;
+    protected volatile boolean clientConnected;
+    protected volatile boolean bindSuccessfull;
     private ServerSocket server;
 
     public MockServer(int p) {
@@ -55,13 +57,15 @@ public class MockServer extends Thread {
         try {
             server = new ServerSocket(port);
         } catch (Exception e) {
-            System.err.println("failed to bind mock server to port " + port);
+            System.err.println("failed to bind mock server to port " + port + ". " + e.toString());
             return;
         }
 
+        bindSuccessfull = true;
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Socket client = server.accept();
+                clientConnected = true;
 
                 BufferedWriter out = new BufferedWriter(new
                         OutputStreamWriter(client.getOutputStream()));
@@ -73,11 +77,9 @@ public class MockServer extends Thread {
                     out.flush();
                     //System.out.println("+" + data);
                 }
-
                 client.close();
-
             } catch (java.io.IOException ioe) {
-                System.err.println("error in mock server. ok if it was shutting down.");
+                System.err.println("error in mock server. ok if shut down was requested.");
                 break;
             }
         }

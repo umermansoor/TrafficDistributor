@@ -8,28 +8,31 @@ import static org.junit.Assert.fail;
 public class BlockingCollectorTest {
 
     @Test
-    public void testSize() {
+    public void size() {
         BlockingCollector blc = new BlockingCollector(10);
         try {
-            blc.put("1");
-            assertEquals(1, blc.size());
-            blc.put("2");
-            assertEquals(2, blc.size());
-            blc.put("3");
-            assertEquals(3, blc.size());
+            for (int i = 1; i <= 10; i++) {
+                blc.put(String.valueOf(i));
+                assertEquals(i, blc.size());
+            }
+
         } catch (Exception e) {
             fail("exception thrown");
         }
     }
 
     @Test
-    public void testDropAll() {
-        BlockingCollector blc = new BlockingCollector(10);
+    public void dropAll() {
+        int capacity = 10;
+        BlockingCollector blc = new BlockingCollector(capacity);
         try {
-            blc.put("1");
-            blc.put("2");
-            blc.put("3");
-            assertEquals(3, blc.size());
+            for (int i = 1; i <= capacity; i++) {
+                blc.put(String.valueOf(i));
+                assertEquals(i, blc.size());
+            }
+            assertEquals(capacity, blc.size());
+
+            // Now drop all elements and verify that there are 0 elements remaining.
             blc.dropAll();
             assertEquals(0, blc.size());
         } catch (Exception e) {
@@ -38,7 +41,7 @@ public class BlockingCollectorTest {
     }
 
     @Test
-    public void testStoreAndRetrieve() {
+    public void get_ElementsRetrievedInOrder() {
         BlockingCollector blc = new BlockingCollector(10);
         try {
             String[] events = new String[]{"1", "2", "3", "4", "5"};

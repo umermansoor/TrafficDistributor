@@ -23,21 +23,12 @@ public class Configuration {
             new Host("localhost", 6001)
     };
 
-    /**
-     * Number of seconds the socket can remain idle waiting to receive data
-     * from the server. If this times out, the socket will be closed.
-     */
-    public final int SOCKET_TIMEOUT_SECONDS = 18 * 1000;
 
     /**
      * Set this to `true` to force the app to keep retrying server connection.
      */
     public final boolean CONNECTION_RETRY_FOREVER = true;
 
-    /**
-     * Seconds to wait before re-attempting connection.
-     */
-    public final int CONNECTION_RETRY_DELAY_SECONDS = 5 * 1000;
 
     /**
      * Port for accepting incoming connections from clients.

@@ -50,7 +50,8 @@ public class App {
         }
 
         final OutboundConnectionsManager outboundConnectionManager = new
-                OutboundConnectionsManager(config);
+                OutboundConnectionsManager(config.servers, config.EVENTS_COLLECTOR,
+                config.EVENTS_TRANSFORMER, config.CONNECTION_RETRY_FOREVER);
         final Thread outboundThread = new Thread(outboundConnectionManager);
         outboundThread.start();
 
