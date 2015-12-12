@@ -7,20 +7,19 @@ import static org.junit.Assert.fail;
 
 public class DiscardOldestBlockingCollectorTest {
     @Test
-    public void testBehavior() {
+    public void put_discardOldestElementWhenFull() {
         int capacity = 4;
-        DiscardOldestBlockingCollector oblc = new DiscardOldestBlockingCollector(capacity);
-        assertEquals(0, oblc.size());
+        DiscardOldestBlockingCollector discardOldest = new DiscardOldestBlockingCollector(capacity);
         try {
             String[] events = new String[]{"1", "2", "3", "4", "5", "6", "7", "8"};
 
             for (String s : events) {
-                oblc.put(s);
+                discardOldest.put(s);
             }
-            assertEquals(capacity, oblc.size());
+            assertEquals(capacity, discardOldest.size());
 
             for (int i = capacity; i < events.length; i++) {
-                assertEquals(events[i], oblc.get());
+                assertEquals(events[i], discardOldest.get());
             }
 
         } catch (Exception e) {

@@ -34,7 +34,7 @@ public class DiscardNewestBlockingCollector extends BlockingCollector {
     public boolean put(String event) throws InterruptedException {
         // By default, we wait 1 second before giving up.
         if (!super.eventsQueue.offer(event, 1, TimeUnit.SECONDS)) {
-            logger.error("queue full. no or slow clients connected? dropped event {}.", event);
+            logger.debug("queue full. dropped event {}.", event);
             return false;
         }
         return true;

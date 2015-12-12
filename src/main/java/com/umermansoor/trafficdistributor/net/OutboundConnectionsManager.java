@@ -1,6 +1,7 @@
 package com.umermansoor.trafficdistributor.net;
 
-import com.umermansoor.trafficdistributor.config.Configuration;
+import com.umermansoor.trafficdistributor.collectors.EventCollector;
+import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.slf4j.Logger;
 
@@ -21,14 +22,25 @@ import java.util.concurrent.Executors;
  */
 public class OutboundConnectionsManager implements Runnable {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OutboundConnectionsManager.class);
-    private final Host[] hosts = Configuration.servers;
+    private final Host[] hosts;
+    private final EventCollector collector;
+    private final EventTransformer transformer;
+    private final boolean retryForever;
+
+    public OutboundConnectionsManager(Host[] h, EventCollector cl,
+                                      EventTransformer et, boolean retry) {
+        hosts = h;
+        collector = cl;
+        transformer = et;
+        retryForever = retry;
+    }
 
     public void run() {
         ExecutorService pool = Executors.newFixedThreadPool(hosts.length);
         ExecutorCompletionService<Host> ecs = new ExecutorCompletionService<Host>(pool);
 
         for (Host host : hosts) {
-            ecs.submit(new OutboundConnection(host), host);
+            ecs.submit(new OutboundConnection(host, collector, transformer), host);
         }
 
         while (!Thread.currentThread().isInterrupted()) {
@@ -36,9 +48,9 @@ public class OutboundConnectionsManager implements Runnable {
                 Host disconnected = ecs.take().get();
                 logger.error("disconnected from {}.", disconnected.getHostname());
 
-                if (Configuration.CONNECTION_RETRY_FOREVER) {
-                    Thread.sleep(Configuration.CONNECTION_RETRY_DELAY_SECONDS);
-                    ecs.submit(new OutboundConnection(disconnected), disconnected);
+                if (retryForever) {
+                    Thread.sleep(1000); // Wait this number of seconds before retrying
+                    ecs.submit(new OutboundConnection(disconnected, collector, transformer), disconnected);
                 }
 
             } catch (InterruptedException ie) {

@@ -2,6 +2,7 @@ package com.umermansoor.trafficdistributor.config;
 
 import com.umermansoor.trafficdistributor.collectors.DiscardOldestBlockingCollector;
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
+import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import com.umermansoor.trafficdistributor.utils.Host;
 
 
@@ -14,7 +15,7 @@ public class Configuration {
     /**
      * Specify one or more servers to connect to.
      */
-    public static final Host[] servers = new Host[]{
+    public final Host[] servers = new Host[]{
             // The host information below is for demo purposes. The supplied
             // demo server, `tools/dummy_server.py` runs on these ports if
             // started. Provide your own hosts here.
@@ -22,37 +23,43 @@ public class Configuration {
             new Host("localhost", 6001)
     };
 
-    /**
-     * Number of seconds the socket can remain idle waiting to receive data
-     * from the server. If this times out, the socket will be closed.
-     */
-    public static final int SOCKET_TIMEOUT_SECONDS = 18 * 1000;
 
     /**
      * Set this to `true` to force the app to keep retrying server connection.
      */
-    public static final boolean CONNECTION_RETRY_FOREVER = true;
+    public final boolean CONNECTION_RETRY_FOREVER = true;
 
-    /**
-     * Seconds to wait before re-attempting connection.
-     */
-    public static final int CONNECTION_RETRY_DELAY_SECONDS = 5 * 1000;
 
     /**
      * Port for accepting incoming connections from clients.
      */
-    public static final int LISTENING_PORT = 7002;
-    public static final int MAX_CLIENT_CONNECTIONS = 100;
-    public static final boolean TRACE_INCOMING_EVENTS = true;
+    public final int LISTENING_PORT = 7002;
+
     /**
-     * Size of the collector
+     * Maximum number of client connections to allow.
      */
-    private static int COLLECTOR_CAPACITY = 20;
+    public final int MAX_CLIENT_CONNECTIONS = 100;
+
+    /**
+     * Will log all incoming events if set to true.
+     */
+    public final boolean TRACE_INCOMING_EVENTS = true;
+    /**
+     * Specify the Event Transformer class. This class is given an opportunity
+     * to transform, filter, modify or drop incoming events.
+     */
+    public final EventTransformer EVENTS_TRANSFORMER = new
+            EventTransformer();
+    /**
+     * Size of the collector. This is the maximum number of events that could
+     * be stored in the collector while waiting for clients to retreive them.
+     */
+    private int COLLECTOR_CAPACITY = 20;
     /**
      * Specify the type of collector where events are stored before being
      * forwarded to clients.
      */
-    public static final EventCollector EVENTS_COLLECTOR = new
+    public final EventCollector EVENTS_COLLECTOR = new
             DiscardOldestBlockingCollector(COLLECTOR_CAPACITY);
 
 }

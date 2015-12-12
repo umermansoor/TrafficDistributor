@@ -24,14 +24,15 @@ public class App {
 
         System.out.println(name + version);
 
-        if (Configuration.servers.length == 0) {
+        Configuration config = new Configuration();
+        if (config.servers.length == 0) {
             logger.debug("no servers were found in the configuration to connect with. quitting");
             return;
         }
 
         CountDownLatch serverStartedSignal = new CountDownLatch(1);
         final IncomingConnectionsManager inboundConnectionManager = new
-                IncomingConnectionsManager(serverStartedSignal);
+                IncomingConnectionsManager(serverStartedSignal, config);
         final Thread inboundThread = new Thread(inboundConnectionManager);
         inboundThread.start();
 
@@ -49,7 +50,8 @@ public class App {
         }
 
         final OutboundConnectionsManager outboundConnectionManager = new
-                OutboundConnectionsManager();
+                OutboundConnectionsManager(config.servers, config.EVENTS_COLLECTOR,
+                config.EVENTS_TRANSFORMER, config.CONNECTION_RETRY_FOREVER);
         final Thread outboundThread = new Thread(outboundConnectionManager);
         outboundThread.start();
 
