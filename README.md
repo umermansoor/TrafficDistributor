@@ -2,16 +2,18 @@
 
 Overview
 ========
-JSON TCP Distributor is used for efficiently distributing incoming JSON events over TCP across multiple back-end 
-nodes. 
+TCP Distributor is a proxy/load balancer for spreading JSON events across backend servers.
 
 ![alt tag](docs/overall_idea.png)
 
-Use this app if you need to:
+Features:
  
-1. Connect to one or more servers which send a continuous stream of JSON (or CSV or Strings), and,
-2. Optionally filter or transform incoming events (e.g. apply throttle, drop invalid, tag etc.), and,
-3. Distribute incoming events to two or more back-end nodes.
+1. The front-end can act as a server listening for connections or open connections itself as a client.
+2. It works with servers that stream JSON events.
+3. Throttle or limit the rate of incoming events.
+4. Scrub, filter or transform incoming events.
+5. Load balance decisions are taken for each event.
+6. Distribute incoming events to back-end nodes.
  
 JSON TCP Distributor works with JSON, but will also work with CSV or any String. The only requirement is that the
 events must be separated by new lines.
@@ -61,21 +63,21 @@ Modify class `com.umermansoor.trafficdistributor.config.Configuration` to change
 Major Components
 ================
 
-## 1. Outbound Connections
+## 1. Front-end (Outbound or InboundConnections)
 
 These modules handle communication with servers which produce JSON events. They take care of everything including
 dealing with errors such as lost connections. All incoming events are first passed through 
 **Transformers** before being stored in **Collectors**.
 
-## 2. Transformers
+## 2. Transformers to Scrub Events
 
 Transformer is called when an event is received and given an opportunity to apply a filter, threshold or
 modify the event. For example, a simple transformer could check if the event is invalid and 
 discard it without forwarding it to clients. 
 
-## 3. Collectors
+## 3. Collectors to Limit Rate
 
-These modules form the central repository where events are stored and later retrieved to be sent to clients. This 
+These modules form the central repository where events are stored and later retrieved to be sent to clients.  This 
 allows the app to keep event producers decoupled from event consumers. Various types of collectors are provided 
 depending on the kind of behavior required when the collector is full:
 
@@ -83,13 +85,18 @@ depending on the kind of behavior required when the collector is full:
 * `DiscardNewestBlockingCollector`: Rejects new events if the collector is full.
 * `DiscardOldestBlockingCollector`: Discards oldest event if the collector is full.
 
-## 4. Inbound Connections
+## 5. Back-end (Inbound Connections)
 
 These modules handle communication with the back-end clients and sends events to them. A TCP server is started
 to allow clients to connect with the app.
 
 FAQ
 ===
+
+## Why not use HAProxy?
+
+The front-end of HAProxy waits for incoming connections, whereas Traffic Distributor can also establish connections. In
+Traffic Distributor load balancing decisions are taken for each incoming JSON event. 
 
 ## Why not use a Message Broker or Messaging Middleware?
 
