@@ -2,18 +2,17 @@
 
 Overview
 ========
-TCP Distributor is a proxy/load balancer for spreading JSON events across backend servers.
+TCP Distributor is a a smart application for spreading events across backend servers.
 
 ![alt tag](docs/overall_idea.png)
 
 Features:
  
-1. The front-end can act as a server listening for connections or open connections itself as a client.
+1. The front-end can act as a server listening for connections or open connections by presenting itself as a client.
 2. It works with servers that stream JSON events.
 3. Throttle or limit the rate of incoming events.
 4. Scrub, filter or transform incoming events.
-5. Load balance decisions are taken for each event.
-6. Distribute incoming events to back-end nodes.
+5. Distribute incoming events to back-end nodes.
  
 JSON TCP Distributor works with JSON, but will also work with CSV or any String. The only requirement is that the
 events must be separated by new lines.
@@ -93,12 +92,17 @@ to allow clients to connect with the app.
 FAQ
 ===
 
-## Why not use HAProxy?
+# How are events load balanced?
 
-The front-end of HAProxy waits for incoming connections, whereas Traffic Distributor can also establish connections. In
-Traffic Distributor load balancing decisions are taken for each incoming JSON event. 
+Traffic Distributor exposes a central queue in which all events are placed. Clients directly checkout events from
+the queue. The benefits of this approach are:
 
-## Why not use a Message Broker or Messaging Middleware?
+* eliminates the need to perform health checks on servers: a dead client won't check out events.
+* when a client is under load, the rate at which they check out events is slowed down (Creating 'backpressure' on 
+servers).
+* a more powerful client will automatically checkout more events than a slower client.
+
+# Why not use a Message Broker or HAProxy?
 
 The short answer is that you could and **you should** if your requirements allow for it. The reason I created this app
 was because I often needed similar functionality when building a large mission critical platform that had

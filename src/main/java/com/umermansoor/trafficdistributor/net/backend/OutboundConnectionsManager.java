@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor.net;
+package com.umermansoor.trafficdistributor.net.backend;
 
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
 import com.umermansoor.trafficdistributor.transformers.EventTransformer;
@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Manages outgoing TCP connections to servers. For each server connection, it
- * creates a task which is an instance of {@link com.umermansoor.trafficdistributor.net.OutboundConnection}
+ * creates a task which is an instance of {@link OutboundConnection}
  * and hands it the responsibility of handling communications with the server.
  *
  * If the socket to client becomes disconnected, it creates a new task to

@@ -2,6 +2,7 @@ package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.collectors.BlockingCollector;
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
+import com.umermansoor.trafficdistributor.net.backend.OutboundConnection;
 import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.junit.After;

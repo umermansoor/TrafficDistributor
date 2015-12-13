@@ -1,8 +1,8 @@
 package com.umermansoor.trafficdistributor;
 
 import com.umermansoor.trafficdistributor.config.Configuration;
-import com.umermansoor.trafficdistributor.net.IncomingConnectionsManager;
-import com.umermansoor.trafficdistributor.net.OutboundConnectionsManager;
+import com.umermansoor.trafficdistributor.net.backend.OutboundConnectionsManager;
+import com.umermansoor.trafficdistributor.net.frontend.IncomingConnectionsManager;
 import org.slf4j.Logger;
 
 import java.util.concurrent.CountDownLatch;

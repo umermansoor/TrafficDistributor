@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor.net;
+package com.umermansoor.trafficdistributor.net.frontend;
 
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
 import com.umermansoor.trafficdistributor.config.Configuration;
