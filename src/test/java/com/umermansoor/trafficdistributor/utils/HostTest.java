@@ -12,7 +12,6 @@ public class HostTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-
     @Test
     public void equalsContract_SameHosts() {
         Host h1 = new Host("0.0.0.1", 6543);

@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor.net;
+package com.umermansoor.trafficdistributor.net.backend;
 
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
 import com.umermansoor.trafficdistributor.config.TcpSocket;
@@ -66,7 +66,8 @@ public class OutboundConnection implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             String json = in.readLine();
             if (json == null) {
-                continue;
+                logger.error("end of stream reached. breaking");
+                break;
             }
 
             logger.trace("received event: {}", json);

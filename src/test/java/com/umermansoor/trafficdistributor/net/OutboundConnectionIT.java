@@ -2,6 +2,7 @@ package com.umermansoor.trafficdistributor.net;
 
 import com.umermansoor.trafficdistributor.collectors.BlockingCollector;
 import com.umermansoor.trafficdistributor.collectors.EventCollector;
+import com.umermansoor.trafficdistributor.net.backend.OutboundConnection;
 import com.umermansoor.trafficdistributor.transformers.EventTransformer;
 import com.umermansoor.trafficdistributor.utils.Host;
 import org.junit.After;
@@ -21,13 +22,13 @@ import static org.junit.Assert.fail;
  * @author umermansoor
  */
 public class OutboundConnectionIT {
-    private final int mockServerPort = 3333;
+    private final int port = 3333;
     MockServer mockServer;
 
     @Before
     public void setUp() {
         // Start a server
-        mockServer = new MockServer(mockServerPort);
+        mockServer = new MockServer(port);
         mockServer.start();
     }
 
@@ -46,7 +47,7 @@ public class OutboundConnectionIT {
         final EventCollector collector = new BlockingCollector(100);
 
         OutboundConnection oc = new OutboundConnection(new Host("localhost",
-                mockServerPort), collector, transformer);
+                port), collector, transformer);
 
         ExecutorService threadRunner = Executors.newSingleThreadExecutor();
         threadRunner.submit(oc, true);

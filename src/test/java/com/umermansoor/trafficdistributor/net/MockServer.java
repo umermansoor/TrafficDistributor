@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A mock TCP server. Accepts a single client only.
@@ -23,12 +24,19 @@ public class MockServer extends Thread {
     };
 
     private final int port;
-    protected volatile boolean clientConnected;
-    protected volatile boolean bindSuccessfull;
+    private final boolean disconnectClientsImmediately;
+    protected AtomicInteger numClients = new AtomicInteger();
+    protected volatile boolean bindSuccessful;
     private ServerSocket server;
 
+
     public MockServer(int p) {
+        this(p, false);
+    }
+
+    public MockServer(int p, boolean d) {
         port = p;
+        disconnectClientsImmediately = d;
     }
 
     @Override
@@ -61,11 +69,16 @@ public class MockServer extends Thread {
             return;
         }
 
-        bindSuccessfull = true;
+        bindSuccessful = true;
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Socket client = server.accept();
-                clientConnected = true;
+                numClients.incrementAndGet();
+
+                if (disconnectClientsImmediately) {
+                    client.close();
+                    break;
+                }
 
                 BufferedWriter out = new BufferedWriter(new
                         OutputStreamWriter(client.getOutputStream()));
@@ -81,6 +94,12 @@ public class MockServer extends Thread {
             } catch (java.io.IOException ioe) {
                 System.err.println("error in mock server. ok if shut down was requested.");
                 break;
+            } finally {
+                try {
+                    server.close();
+                } catch (java.io.IOException ignored) {
+                }
+
             }
         }
     }

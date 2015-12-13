@@ -1,4 +1,4 @@
-package com.umermansoor.trafficdistributor.net;
+package com.umermansoor.trafficdistributor.net.frontend;
 
 import com.umermansoor.trafficdistributor.config.Configuration;
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 /**
  * Manages incoming TCP connections from clients. Starts a TCP server to
  * listen for client connections. When a client is connected, it creates a new
- * instance of {@link com.umermansoor.trafficdistributor.net.IncomingConnection} and hands it the
+ * instance of {@link IncomingConnection} and hands it the
  * responsibility of handling communications with this client.
  *
  * @author umermansoor
